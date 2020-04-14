@@ -4,10 +4,12 @@
  *  Description: An immutable data type for points in the plane.
  **************************************************************************** */
 
-import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
 import java.util.Comparator;
+
+import static edu.princeton.cs.algs4.StdDraw.line;
+import static edu.princeton.cs.algs4.StdDraw.point;
 
 public class Point implements Comparable<Point> {
     private final int x;     // x-coordinate of this point
@@ -29,7 +31,7 @@ public class Point implements Comparable<Point> {
      * Draws this point to standard draw.
      */
     public void draw() {
-        StdDraw.point(x, y);
+        point(x, y);
     }
 
     /**
@@ -39,7 +41,7 @@ public class Point implements Comparable<Point> {
      * @param that the other point
      */
     public void drawTo(Point that) {
-        StdDraw.line(this.x, this.y, that.x, that.y);
+        line(this.x, this.y, that.x, that.y);
     }
 
     /**
