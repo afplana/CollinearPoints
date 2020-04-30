@@ -4,12 +4,10 @@
  *  Description: An immutable data type for points in the plane.
  **************************************************************************** */
 
+import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
 import java.util.Comparator;
-
-import static edu.princeton.cs.algs4.StdDraw.line;
-import static edu.princeton.cs.algs4.StdDraw.point;
 
 public class Point implements Comparable<Point> {
     private final int x;     // x-coordinate of this point
@@ -23,6 +21,7 @@ public class Point implements Comparable<Point> {
      * @param y the <em>y</em>-coordinate of the point
      */
     public Point(int x, int y) {
+        /* DO NOT MODIFY */
         this.x = x;
         this.y = y;
     }
@@ -31,7 +30,8 @@ public class Point implements Comparable<Point> {
      * Draws this point to standard draw.
      */
     public void draw() {
-        point(x, y);
+        /* DO NOT MODIFY */
+        StdDraw.point(x, y);
     }
 
     /**
@@ -41,7 +41,8 @@ public class Point implements Comparable<Point> {
      * @param that the other point
      */
     public void drawTo(Point that) {
-        line(this.x, this.y, that.x, that.y);
+        /* DO NOT MODIFY */
+        StdDraw.line(this.x, this.y, that.x, that.y);
     }
 
     /**
@@ -56,16 +57,11 @@ public class Point implements Comparable<Point> {
      * @return the slope between this point and the specified point
      */
     public double slopeTo(Point that) {
-        verifyNull(that);
-        if ((that.x == x) && (that.y == y)) return Double.NEGATIVE_INFINITY;
+        if (this.compareTo(that) == 0) return Double.NEGATIVE_INFINITY;
+        if ((that.y - this.y) == 0.0D) return +0.0d;
+        if ((that.x - this.x) == 0.0D) return Double.POSITIVE_INFINITY;
 
-        double u = that.x - x;
-        double v = that.y - y;
-
-        if (v == 0) return 0;
-        if (u == 0) return Double.POSITIVE_INFINITY;
-
-        return v / u;
+        return (double) (that.y - this.y) / (that.x - this.x);
     }
 
     /**
@@ -75,8 +71,8 @@ public class Point implements Comparable<Point> {
      * @return the Comparator that defines this ordering on points
      */
     public Comparator<Point> slopeOrder() {
-        return (point, t1) ->
-                Double.compare(slopeTo(point), slopeTo(t1));
+        return (a, b) ->
+                Double.compare(slopeTo(a), slopeTo(b));
     }
 
     /**
@@ -103,15 +99,8 @@ public class Point implements Comparable<Point> {
      * argument point
      */
     public int compareTo(Point that) {
-        verifyNull(that);
-        return (that.x == x && that.y == y) ? 0 :
-               (that.y > y || (that.y == y && that.x > x)) ? -1 : 1;
-    }
-
-    private void verifyNull(Point that) {
-        if (that == null) {
-            throw new IllegalArgumentException();
-        }
+        if (this.x == that.x && this.y == that.y) return 0;
+        else return (this.y < that.y || (this.y == that.y && this.x < that.x)) ? -1 : 1;
     }
 
     /**

@@ -1,8 +1,7 @@
 /* *****************************************************************************
  *  Name: Alain Plana
- *  Date: 16.04.2020
- *  Description: Examines 4 points at a time and checks whether they all lie
- *  on the same line segment
+ *  Date: 25.04.2020
+ *  Description:
  **************************************************************************** */
 
 import edu.princeton.cs.algs4.In;
@@ -12,25 +11,23 @@ import edu.princeton.cs.algs4.StdOut;
 
 import java.util.Arrays;
 
-public class BruteCollinearPoints {
+public class FastCollinearPoints {
 
     private LineSegment[] segments;
 
-    public BruteCollinearPoints(Point[] points) {
+    public FastCollinearPoints(Point[] points) {
         requiredNonDuplicates(points);
         requiredNonNull(points);
 
+        Stack<LineSegment> segmentStack = new Stack<>();
 
-        Stack<LineSegment> lineSegments = new Stack<>();
-        for (int p = 0; p < points.length; p++)
-            for (int q = p + 1; q < points.length; q++)
-                for (int r = q + 1; r < points.length; r++)
-                    for (int s = r + 1; s < points.length; s++)
-                        verifySlopes(
-                                new Point[] { points[p], points[q], points[r], points[s] },
-                                lineSegments);
+        for (int i = 0; i < points.length - 3; i++) {
+            Arrays.sort(points);
+            Arrays.sort(points, points[i].slopeOrder());
+            collect(points, segmentStack);
+        }
 
-        feedSegments(lineSegments);
+        feedSegments(segmentStack);
     }
 
     public int numberOfSegments() {
@@ -41,11 +38,19 @@ public class BruteCollinearPoints {
         return segments.clone();
     }
 
-    // If 4 points are collinear the add to stack
-    private void verifySlopes(Point[] p, Stack<LineSegment> stack) {
-        assert p.length == 4;
-        Arrays.sort(p);
-        if (collinearPoints(p)) stack.push(new LineSegment(p[0], p[3]));
+    // Store points in stack
+    private void collect(Point[] points, Stack<LineSegment> stack) {
+        Point origin = points[0];
+        for (int first = 1, last = 2; last < points.length; last++) {
+            while (last < points.length &&
+                    abs(origin.slopeTo(points[first])) == abs(origin.slopeTo(points[last]))) last++;
+
+            boolean c1 = last - first >= 3;
+            boolean c2 = origin.compareTo(points[first]) < 0;
+            if (c1 && c2) stack.push(new LineSegment(origin, points[last - 1]));
+
+            first = last;
+        }
     }
 
     // Throws IllegalArgumentException if exist duplicated elements in the array
@@ -65,18 +70,17 @@ public class BruteCollinearPoints {
                     throw new IllegalArgumentException();
     }
 
-
-    // Return true is the given points are collinear
-    private static boolean collinearPoints(Point[] points) {
-        for (int i = 0; i < points.length - 2; i++)
-            if (points[0].slopeTo(points[i + 1]) != points[0].slopeTo(points[i + 2])) return false;
-        return true;
-    }
-
+    // Store elements stored in Stack in array datastructure
     private void feedSegments(Stack<LineSegment> lineSegments) {
         int length = lineSegments.size();
         segments = new LineSegment[length];
         for (int i = 0; i < length; i++) segments[i] = lineSegments.pop();
+    }
+
+
+    // Absolute value
+    private static double abs(double a) {
+        return a <= 0.0D ? 0.0D - a : a;
     }
 
     public static void main(String[] args) {
@@ -101,7 +105,7 @@ public class BruteCollinearPoints {
         StdDraw.show();
 
         // print and draw the line segments
-        BruteCollinearPoints collinear = new BruteCollinearPoints(points);
+        FastCollinearPoints collinear = new FastCollinearPoints(points);
         for (LineSegment segment : collinear.segments()) {
             StdOut.println(segment);
             segment.draw();
